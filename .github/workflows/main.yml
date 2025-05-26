@@ -1,0 +1,34 @@
+name: Build and Release
+
+on:
+  push:
+    paths:
+      - 'kiosk-wm.c'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt update
+          sudo apt install -y gcc-multilib libx11-dev:i386
+
+      - name: Build
+        run: |
+          gcc -m32 -o kiosk-wm kiosk-wm.c -lX11
+
+      - name: Upload Release Asset
+        uses: softprops/action-gh-release@v1
+        with:
+          name: automatic build
+          tag_name: auto-build
+          files: kiosk-wm
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
