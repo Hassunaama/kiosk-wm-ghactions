@@ -4,12 +4,12 @@ on:
   push:
     paths:
       - 'kiosk-wm.c'
+      - 'kiosk-wm-run.sh'
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -18,17 +18,29 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt update
-          sudo apt install -y gcc-multilib libx11-dev:i386
+          sudo apt install -y gcc gcc-multilib libx11-dev libx11-dev:i386 zip
 
-      - name: Build
+      - name: Build 64-bit
+        run: |
+          gcc -m64 -o kiosk-wm kiosk-wm.c -lX11
+          chmod +x kiosk-wm-run.sh
+          chmod +x kiosk-wm
+          zip kiosk-wm-64.zip kiosk-wm kiosk-wm-run.sh
+
+      - name: Build 32-bit
         run: |
           gcc -m32 -o kiosk-wm kiosk-wm.c -lX11
+          chmod +x kiosk-wm-run.sh
+          chmod +x kiosk-wm
+          zip kiosk-wm-32.zip kiosk-wm kiosk-wm-run.sh
 
-      - name: Upload Release Asset
+      - name: Upload Release Assets
         uses: softprops/action-gh-release@v1
         with:
           name: automatic build
           tag_name: auto-build
-          files: kiosk-wm
+          files: |
+            kiosk-wm-64.zip
+            kiosk-wm-32.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
