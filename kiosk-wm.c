@@ -5,10 +5,12 @@ int main() {
     if (!display) return 1;
 
     // Get default screen and its dimensions.
-    int screen = DefaultScreen(display),
-        width = DisplayWidth(display, screen),
-        height = DisplayHeight(display, screen);
-
+    //int screen = DefaultScreen(display);
+        // width = DisplayWidth(display, screen),
+        // height = DisplayHeight(display, screen);
+    int width = 1024,
+        height = 768;
+    
     Window root = DefaultRootWindow(display);
 
     // This allows us to receive CreateNotify and ConfigureNotify events.
